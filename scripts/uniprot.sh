@@ -36,17 +36,17 @@ update_versionlist() {
 
 # ------------------ Main -------------------------------------------------
 
-! command -v diamond > /dev/null 2>&1 || (echo 1>&2 "DIAMOND sequence aligner need to be available in current environment..." && exit 4)
+command -v diamond > /dev/null 2>&1 || { echo 1>&2 "DIAMOND sequence aligner need to be available in current environment..."; exit 4; }
 
 [ -d "$basepath" ] || (echo 1>&2 "$basepath does not seem to exist" && exit 1)
 
-cd "$basepath" || (echo 1>&2 "Something went wrong..." && exit 2)
+cd "$basepath" || { echo 1>&2 "Something went wrong..."; exit 2; }
 
 [ -d "$dbpath" ] && rm -rf "$dbpath"
 
 mkdir -p "$dbpath"
 
-cd "$dbpath" || (echo 1>&2 "Something went wrong..." && exit 3)
+cd "$dbpath" || { echo 1>&2 "Something went wrong..."; exit 3; }
 
 echo "Downloading $db..." \
 &&

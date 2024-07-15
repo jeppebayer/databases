@@ -36,15 +36,15 @@ update_versionlist() {
 
 # ------------------ Main -------------------------------------------------
 
-[ -d "$basepath" ] || (echo 1>&2 "$basepath does not seem to exist" && exit 1)
+[ -d "$basepath" ] || { echo 1>&2 "$basepath does not seem to exist" ; exit 1; }
 
-cd "$basepath" || (echo 1>&2 "Something went wrong..." && exit 2)
+cd "$basepath" || { echo 1>&2 "Something went wrong..."; exit 2; }
 
 [ -d "$dbpath" ] && rm -rf "$dbpath"
 
 mkdir -p "$dbpath"
 
-cd "$dbpath" || (echo 1>&2 "Something went wrong..." && exit 3)
+cd "$dbpath" || { echo 1>&2 "Something went wrong..."; exit 3; }
 
 echo "Downloading $db..." \
 && \
