@@ -10,16 +10,18 @@ address="http://ftp.ebi.ac.uk/pub/databases/uniprot/current_release/knowledgebas
 # ------------------ Functions --------------------------------------------
 
 update_versionlist() {
-	[ -e "$1"/dbversions.tsv ] || echo -e "database\tlast_updated" > "$1"/dbversions.tsv
+	[ -e "$1"/dbversions.tsv ] || echo -e "database\tlast_updated\tuser" > "$1"/dbversions.tsv
 
 	versions="$(awk \
 		-v db="$2" \
 		-v date="$(date +%d-%m-%Y)" \
+		-v user="$USER" \
 		'BEGIN{FS = OFS = "\t"}
 		{
 		if ($1 == db)
 			{
 			$2 = date
+			$3 = user
 			add = "n"
 			}
 		print $0
@@ -27,7 +29,7 @@ update_versionlist() {
 		END{
 		if (add == "n")
 			{exit}
-		print db, date
+		print db, date, user
 		}' \
 		"$1"/dbversions.tsv)"
 
@@ -38,7 +40,7 @@ update_versionlist() {
 
 command -v diamond > /dev/null 2>&1 || { echo 1>&2 "DIAMOND sequence aligner need to be available in current environment..."; exit 4; }
 
-[ -d "$basepath" ] || (echo 1>&2 "$basepath does not seem to exist" && exit 1)
+[ -d "$basepath" ] || { echo 1>&2 "$basepath does not seem to exist"; exit 1; }
 
 cd "$basepath" || { echo 1>&2 "Something went wrong..."; exit 2; }
 
@@ -53,7 +55,10 @@ echo "Downloading $db..." \
 curl \
 	-L \
 	"$address" \
-| tar -xzf - -C .\
+| tar \
+	-xzf \
+	- \
+	-C .\
 && \
 echo "$db available in $basepath/$dbpath"
 
@@ -61,20 +66,19 @@ update_versionlist "$basepath" "$db"
 
 echo "Concatenating protein sequence files..." \
 && \
-cat \
-	"$(find . -mindepth 3 \
-	| grep "fasta.gz" \
-	| grep -v 'DNA' \
-	| grep -v 'additional' \
-	| xargs)" \
-	> reference_proteomes.fasta.gz \
+find . -mindepth 3 \
+| grep "fasta.gz" \
+| grep -v 'DNA' \
+| grep -v 'additional' \
+| xargs cat \
+> reference_proteomes.fasta.gz \
 && \
 echo "reference_proteomes.fasta.gz complete.."
 
 echo "Creating taxon ID map..." \
 && \
-cat \
-	./*/*/*.idmapping \
+zcat \
+	./*/*/*.idmapping.gz \
 | awk \
 	'BEGIN{
 	FS = OFS = "\t"

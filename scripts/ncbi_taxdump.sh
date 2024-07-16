@@ -15,11 +15,13 @@ update_versionlist() {
 	versions="$(awk \
 		-v db="$2" \
 		-v date="$(date +%d-%m-%Y)" \
+		-v user="$USER" \
 		'BEGIN{FS = OFS = "\t"}
 		{
 		if ($1 == db)
 			{
 			$2 = date
+			$3 = user
 			add = "n"
 			}
 		print $0
@@ -27,7 +29,7 @@ update_versionlist() {
 		END{
 		if (add == "n")
 			{exit}
-		print db, date
+		print db, date, user
 		}' \
 		"$1"/dbversions.tsv)"
 
@@ -51,7 +53,9 @@ echo "Downloading $db..." \
 curl \
 	-L \
 	"$address" \
-| tar -xzf - \
+| tar \
+	-xzf \
+	- \
 && \
 echo "$db available in $basepath/$dbpath"
 

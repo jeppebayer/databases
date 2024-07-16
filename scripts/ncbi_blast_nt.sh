@@ -2,42 +2,65 @@
 
 # ------------------ Configuration ----------------------------------------
 
-# Sources necessary environment
-if [ "$USER" == "jepe" ]; then
-	# shellcheck disable=1090
-	source /home/"$USER"/.bashrc
-	#shellcheck disable=1091
-	source activate assembly
-fi
-
+db="NCBI_BLAST_nt"
 basepath="/faststorage/project/EcoGenetics/databases"
-
 dbpath="NCBI_BLAST_DB/nt"
+address="ftp://ftp.ncbi.nlm.nih.gov/blast/db"
 
-[ -d "$basepath" ] || (echo "$basepath does not seem to exist" && exit 1)
+# ------------------ Functions --------------------------------------------
 
-cd "$basepath" || (echo "Something went wrong..." && exit 2)
+update_versionlist() {
+	[ -e "$1"/dbversions.tsv ] || echo -e "database\tlast_updated" > "$1"/dbversions.tsv
+
+	versions="$(awk \
+		-v db="$2" \
+		-v date="$(date +%d-%m-%Y)" \
+		-v user="$USER" \
+		'BEGIN{FS = OFS = "\t"}
+		{
+		if ($1 == db)
+			{
+			$2 = date
+			$3 = user
+			add = "n"
+			}
+		print $0
+		}
+		END{
+		if (add == "n")
+			{exit}
+		print db, date, user
+		}' \
+		"$1"/dbversions.tsv)"
+
+	echo -n "$versions" > "$1"/dbversions.tsv
+}
+
+# ------------------ Main -------------------------------------------------
+
+[ -d "$basepath" ] || { echo "$basepath does not seem to exist"; exit 1; }
+
+cd "$basepath" || { echo "Something went wrong..."; exit 2; }
 
 [ -d "$dbpath" ] && rm -rf "$dbpath"
 
 mkdir -p "$dbpath"
 
-cd "$dbpath" || (echo "Something went wrong..." && exit 3)
+cd "$dbpath" || { echo "Something went wrong..."; exit 3; }
 
-update_blastdb.pl \
-	--source ncbi \
-	--num_threads 20 \
-	--force_ftp \
-	--passive \
-	--decompress \
-	nt
-
-exit 0
-
-wget "ftp://ftp.ncbi.nlm.nih.gov/blast/db/nt.*.tar.gz"
-
-for i in */; do
-	tar -xzf "$i" && rm "$i"
+# ^ anchors to beginning of line, [0-9] matches digits, + mathces one or more of the previous character, $ anchors to the end of the line
+for i in $(curl -vs "$address"/ 2>&1 | awk '{if ($9 ~/^nt\.[0-9]+\.tar\.gz$/) {print $9}}'); do
+	echo "Downloading $i..." \
+	&& \
+	curl \
+		-L \
+		"$address"/"$i" \
+	| tar \
+		-xzf \
+		-
 done
+echo "$db available in $basepath/$dbpath"
+
+update_versionlist "$basepath" "$db"
 
 exit 0

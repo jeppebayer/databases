@@ -1,14 +1,14 @@
-database	last_updated
-NCBI_Taxdump	15-07-2024
-BUSCO_arachnida_odb10	18/06-2024
-BUSCO_arthropoda_odb10	18/06-2024
-BUSCO_endopterygota_odb10	18/06-2024
-BUSCO_insecta_odb10	18/06-2024
-BUSCO_lepidoptera_odb10	18/06-2024
-BUSCO_metazoa_odb10	18/06-2024
-Dfam	18/06-2024
-GTDB	18/06-2024
-NCBI_BLAST_nt	
-RepBase	18/06-2024
-silva	18/06-2024
-UniProt	18/06-2024
+database	last_updated	user
+NCBI_Taxdump	15-07-2024	jepe
+BUSCO_arachnida_odb10	18/06-2024	jepe
+BUSCO_arthropoda_odb10	18/06-2024	jepe
+BUSCO_endopterygota_odb10	18/06-2024	jepe
+BUSCO_insecta_odb10	18/06-2024	jepe
+BUSCO_lepidoptera_odb10	18/06-2024	jepe
+BUSCO_metazoa_odb10	18/06-2024	jepe
+Dfam	18/06-2024	jepe
+GTDB	18/06-2024	jepe
+NCBI_BLAST_nt	16/07-2024	jepe
+RepBase	18/06-2024	jepe
+silva	18/06-2024	jepe
+UniProt	16-07-2024	jepe
