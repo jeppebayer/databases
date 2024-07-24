@@ -38,15 +38,15 @@ update_versionlist() {
 
 # ------------------ Main -------------------------------------------------
 
-[ -d "$basepath" ] || { echo "$basepath does not seem to exist"; exit 1; }
+[ -d "$basepath" ] || { echo 1>&2 "$basepath does not seem to exist"; exit 1; }
 
-cd "$basepath" || { echo "Something went wrong..."; exit 2; }
+cd "$basepath" || { echo 1>&2 "Something went wrong..."; exit 2; }
 
 [ -d "$dbpath" ] && rm -rf "$dbpath"
 
 mkdir -p "$dbpath"
 
-cd "$dbpath" || { echo "Something went wrong..."; exit 3; }
+cd "$dbpath" || { echo 1>&2 "Something went wrong..."; exit 3; }
 
 # ^ anchors to beginning of line, [0-9] matches digits, + mathces one or more of the previous character, $ anchors to the end of the line
 for i in $(curl -vs "$address"/ 2>&1 | awk '{if ($9 ~/^nt\.[0-9]+\.tar\.gz$/) {print $9}}'); do
