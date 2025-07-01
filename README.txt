@@ -59,6 +59,8 @@ find v5/data -name "*.tar.gz" | while read -r TAR; do tar -C `dirname $TAR` -xzf
 find v5/data -name "*.tar.gz" | while read -r TAR; do rm $TAR; done
 mv v5/data/* ./
 rm -r v5/
+for i in lineages/*/refseq_db.faa.gz; do chmod g+w "$i"; done
+for i in lineages/*; do chmod g+w "$i"; done
 # OPTIONAL. Compress and clean up
 tar -cvzf BUSCO_"$DATE".tar.gz BUSCO_"$DATE"
 rm -r BUSCO_"$DATE"
